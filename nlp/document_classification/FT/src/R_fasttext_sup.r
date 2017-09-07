@@ -1,5 +1,5 @@
 #!/usr/bin/Rscript
-setwd('~/teradata/analysis/machine-learning/nlp/document_classification/')
+setwd('~/teradata/analysis/machine-learning/nlp/document_classification/FT/')
 library('data.table');library('stringi')
 
 
@@ -56,14 +56,11 @@ clean_data <- function(label_desc) {
   #remove trailing number
   label_desc <- stri_trim_both(label_desc)
   label_desc <- stri_replace_all_regex(label_desc,'^\\d+\\b','')
-  label_desc <- stri_replace_all_regex(label_desc,'(\\b\\d+\\b)','_num_')
   
   #space
   label_desc <- stri_trim_both(label_desc)
   label_desc <- stri_replace_all_regex(label_desc,'\\p{Z}+',' ')
   
-  #final _num_ regrouping
-  label_desc <- stri_replace_all_regex(label_desc,'_num_ (?=_num_)','')
   
   return(label_desc)
   
@@ -74,7 +71,7 @@ clean_data <- function(label_desc) {
 
 #----supervised data ----------------
 
-d_sup <- fread('~/teradata/analysis/machine-learning/nlp/data/full/FULL_SUP.csv')
+d_sup <- fread('data/full/FETCHED.csv')
 #shuffle before saving
 set.seed(1L); d_sup <- d_sup[sample(nrow(d_sup), nrow(d_sup),replace = FALSE),]
 
@@ -89,14 +86,14 @@ d_sup[,label_desc:=clean_data(label_desc)]
 
 #------ split train - test -validation --------
 # n <- d_sup[,.N]
-fwrite(d_sup[ 1 : round(d_sup[,.N]*.1 -1)   ,.(tag,label_desc) ],file='FT/data/mlstr.test',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
-fwrite(d_sup[ round(d_sup[,.N]*.1) : round(d_sup[,.N]*.2 -1)   ,.(tag,label_desc) ],file='FT/data/mlstr.validation',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
-fwrite(d_sup[ round(d_sup[,.N]*.2) : round(d_sup[,.N])   ,.(tag,label_desc) ],file='FT/data/mlstr.train',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
+fwrite(d_sup[ 1 : round(d_sup[,.N]*.1 -1)   ,.(tag,label_desc) ],file='data/mlstr.test',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
+fwrite(d_sup[ round(d_sup[,.N]*.1) : round(d_sup[,.N]*.2 -1)   ,.(tag,label_desc) ],file='data/mlstr.validation',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
+fwrite(d_sup[ round(d_sup[,.N]*.2) : round(d_sup[,.N])   ,.(tag,label_desc) ],file='data/mlstr.train',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
 
-fwrite(d_sup[ ,.(tag,label_desc) ],file='FT/data/mlstr.all',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
+fwrite(d_sup[ ,.(tag,label_desc) ],file='data/mlstr.all',na = '',row.names = FALSE,col.names = FALSE,sep = '\t')
 
 #- save file 
-fwrite(d_sup[ ,.(tag,label_desc) ],file='FT/data/sup_csv/mlstr.sup.csv',na = '',row.names = FALSE,col.names = FALSE)
+fwrite(d_sup[ ,.(tag,label_desc) ],file='data/sup/mlstr.sup.csv',na = '',row.names = FALSE,col.names = FALSE)
 
 
 
