@@ -111,9 +111,9 @@ clean_artifact <- function(dt){
 
 
 #------------------------MAIN ---------------------
-o <- opal.login('xxxxxx','xxxxxxx',url = 'https://opal.maelstrom-research.org')
+#o <- opal.login('xxxxxx','xxxxxxx',url = 'https://opal.maelstrom-research.org')
 
-
+setwd('~/teradata/analysis/machine-learning/nlp/document_classification/FT/')
 FF <- extract_multids_attr(o,filter_out = c('test','melissa','study-dataset','ramon','patate','ttt','frele','nuage','chpttest','stephane'))
 
 
@@ -129,5 +129,9 @@ DF <- clean_artifact(FF)
 #merge label and desc into label_desc
 DF <- label_desc_merge(DF)
 
+DF[,tag_label:= stri_c(tag,label,sep=' ')]
+
+DF <- DF[!duplicated(tag_label),]
+
 #--- save file 
-write.csv(DF,file='data/full/FETCHED.csv',na = '',row.names = FALSE)
+fwrite(DF,file='data/full/FETCHED.csv',na = '',row.names = FALSE)
