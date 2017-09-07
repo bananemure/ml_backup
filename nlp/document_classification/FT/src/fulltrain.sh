@@ -9,20 +9,22 @@ N=$1
 mkdir -p "${MODELDIR}"
 mkdir -p "${DATADIR}"
 
-if $TRAINING; then 
 ##	INFO
 cmd="fasttext supervised -input "${DATADIR}/mlstr.all" -output "${MODELDIR}/modelsup$N" -dim 75 -lr .5 -wordNgrams 3 -minCount 1 -bucket 1000000 -epoch 20 -thread 6 -lrUpdateRate 1000 -label tag_  -ws 20  -minCountLabel 1 -minn 5 -pretrainedVectors ${PRETRAINMODELDIR}/model_skipgram.char1.vec"
 
 echo TRAINING: 
 echo $cmd
-
 eval $cmd
 
+echo TESTS
+cmdt="fasttext test ${MODELDIR}/modelsup$N.bin ${DATADIR}/mlstr.test"
+echo $cmdt
+eval $cmdt
 
-fi
+echo VALIDATION
+cmdv="fasttext test ${MODELDIR}/modelsup$N.bin ${DATADIR}/mlstr.validation"
+echo $cmdv
+eval $cmdv
 
 
 
-
-bash src/predict.sh $N mlstr.test
-bash src/predict.sh $N mlstr.validation
